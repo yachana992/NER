@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 
 data = pd.read_csv("annotatedNepaliNERDataPOS.csv")
 
-data = data.head(10000)
+data = data.head(5000)
 
 # A class to retrieve the sentences from the dataset
 class getsentence(object):
