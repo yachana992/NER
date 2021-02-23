@@ -32,11 +32,18 @@ class getsentence(object):
 
 getter = getsentence(data)
 sentences = getter.sentences
-#This is how a sentence will look like. 
-print(sentences)
 
-# Feature set
+
+# Defines feature set of a word
 def word2features(sent, i):
+    """
+    Arguments:
+    sent = word in a sentence
+    i = index of the word in the sentence
+    
+    Output:
+    features = dictionary of features of each word
+    """
     word = sent[i][0]
     length = len(word)
     postag = sent[i][1]
@@ -76,19 +83,31 @@ def word2features(sent, i):
     return features
 
 def sent2features(sent):
+    """
+    Arguments:
+    sent = sentence
+    
+    Output:
+    returns a feature vector for words in a sentence
+    """
     return [word2features(sent, i) for i in range(len(sent))]
 
 def sent2labels(sent):
+    """
+    Arguments:
+    sent = sentence
+    
+    Output:
+    return lists of labels in the sentences
+    """
     return [label for token, postag, label in sent]
 
-#Creating the train and test set
+#Creating the features and labels for the dataset
 X = [sent2features(s) for s in sentences]
 y = [sent2labels(s) for s in sentences]
 
-
 X_feat = [item for sublist in X for item in sublist]
 y_label = [item for sublist in y for item in sublist]
-
 
 #Converting the feature arrays into feature vectors)
 vec = DictVectorizer(sparse=False)
@@ -101,9 +120,10 @@ y_data, meta_data = pd.factorize(y_label)
 
 print(y_data)
 
+#Splitting the dataset into train and test set
 X_train, X_test, y_train, y_test = train_test_split(X_arr, y_data, test_size=0.33, random_state=42)
 
-
+#calculating entropy
 def entropy(y):
     hist = np.bincount(y)
     ps = hist / len(y)
@@ -124,14 +144,21 @@ class Node:
 
 
 class DecisionTree:
-
+    
+    #Initializing the class
     def __init__(self, min_samples_split=2, max_depth=100, n_feats=None):
         self.min_samples_split = min_samples_split
         self.max_depth = max_depth
         self.n_feats = n_feats
         self.root = None
-
+   
+#function to fit the model
     def fit(self, X, y):
+        """
+        Argument:
+        X = features 
+        y = labels
+        """
         self.n_feats = X.shape[1] if not self.n_feats else min(self.n_feats, X.shape[1])
         self.root = self._grow_tree(X, y)
 
@@ -214,9 +241,11 @@ class DecisionTree:
         most_common = counter.most_common(1)[0][0]
         return most_common
 
+#Fitting the model
 clf = DecisionTree(max_depth=10)
 clf.fit(X_train,y_train)
 
+#Predicting labels for the test set
 y_pred = clf.predict(X_test)
 
 #To calculate the accuracy of the model
@@ -224,6 +253,7 @@ def accuracy(y_true, y_pred):
     accuracy = np.sum(y_true == y_pred) / len(y_true)
     return accuracy
 
+#Calculating accuracy of the model
 acc = accuracy(y_test, y_pred)
 
 print(acc)
